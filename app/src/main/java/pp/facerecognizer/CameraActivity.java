@@ -286,6 +286,11 @@ public abstract class CameraActivity extends AppCompatActivity
                         (size, rotation) -> {
                             previewHeight = size.getHeight();
                             previewWidth = size.getWidth();
+
+//                            if (MainActivity.modelsWithCameraIssue.contains(Build.MODEL)) {
+//                                LOGGER.d("CameraConnectionFragment() %d", rotation);
+//                                rotation = 270;
+//                            }
                             CameraActivity.this.onPreviewSizeChosen(size, rotation);
                         },
                         this,

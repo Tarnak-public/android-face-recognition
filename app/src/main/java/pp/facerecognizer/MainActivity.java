@@ -28,6 +28,7 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.media.ImageReader.OnImageAvailableListener;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Size;
@@ -41,6 +42,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
@@ -58,6 +60,7 @@ import pp.facerecognizer.tracking.MultiBoxTracker;
 * objects.
 */
 public class MainActivity extends CameraActivity implements OnImageAvailableListener {
+    public static List<String> modelsWithCameraIssue = Arrays.asList("GC116C", "rk3288","Android SDK built for x86");
     private static final Logger LOGGER = new Logger();
 
     private static final int FACE_SIZE = 160;
@@ -147,7 +150,7 @@ public class MainActivity extends CameraActivity implements OnImageAvailableList
         previewHeight = size.getHeight();
 
         sensorOrientation = rotation - getScreenOrientation();
-        LOGGER.i("Camera orientation relative to screen canvas: %d", sensorOrientation);
+        LOGGER.i("Camera orientation relative to screen canvas: %d %s", sensorOrientation , Build.MODEL);
 
         LOGGER.i("Initializing at size %dx%d", previewWidth, previewHeight);
         rgbFrameBitmap = Bitmap.createBitmap(previewWidth, previewHeight, Config.ARGB_8888);

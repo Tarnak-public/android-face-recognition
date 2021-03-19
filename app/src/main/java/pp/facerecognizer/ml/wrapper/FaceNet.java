@@ -102,6 +102,7 @@ public class FaceNet {
 
     private FaceNet() {}
 
+    @SuppressWarnings("PointlessArithmeticExpression")
     public FloatBuffer getEmbeddings(Bitmap originalBitmap, Rect rect) {
         // Log this method so that it can be analyzed with systrace.
         Trace.beginSection("getEmbeddings");

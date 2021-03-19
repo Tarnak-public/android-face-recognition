@@ -16,12 +16,14 @@
 
 package pp.facerecognizer;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
@@ -38,10 +40,12 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.ImageReader;
 import android.media.ImageReader.OnImageAvailableListener;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
@@ -50,6 +54,8 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import androidx.core.app.ActivityCompat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -107,7 +113,8 @@ public class CameraConnectionFragment extends Fragment {
                 }
 
                 @Override
-                public void onSurfaceTextureUpdated(final SurfaceTexture texture) {}
+                public void onSurfaceTextureUpdated(final SurfaceTexture texture) {
+                }
             };
 
     /**
@@ -414,6 +421,16 @@ public class CameraConnectionFragment extends Fragment {
             if (!cameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
                 throw new RuntimeException("Time out waiting to lock camera opening.");
             }
+            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
             manager.openCamera(cameraId, stateCallback, backgroundHandler);
         } catch (final CameraAccessException e) {
             LOGGER.e(e, "Exception!");
@@ -569,7 +586,12 @@ public class CameraConnectionFragment extends Fragment {
         if (null == textureView || null == previewSize || null == activity) {
             return;
         }
-        final int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+        if (MainActivity.modelsWithCameraIssue.contains(Build.MODEL)) {
+            Log.d("configureTransform()", "For this model workaround for camera rotation was needed. rotation:" + rotation);
+            rotation = 1;
+
+        }
         final Matrix matrix = new Matrix();
         final RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
         final RectF bufferRect = new RectF(0, 0, previewSize.getHeight(), previewSize.getWidth());
